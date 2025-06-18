@@ -1,0 +1,68 @@
+{
+    "name": "mamunhoque/laravel-crud-builder",
+    "description": "Advanced Laravel CRUD Builder - Automatically generate complete CRUD operations with intelligent migration parsing and code generation",
+    "keywords": [
+        "laravel",
+        "crud",
+        "generator",
+        "artisan",
+        "migration",
+        "code-generation",
+        "api",
+        "rest"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mamun Hoque",
+            "email": "mamun@example.com",
+            "role": "Developer",
+            "homepage": "https://github.com/mamunhoque"
+        }
+    ],
+    "homepage": "https://github.com/mamunhoque/laravel-crud-builder",
+    "support": {
+        "issues": "https://github.com/mamunhoque/laravel-crud-builder/issues",
+        "source": "https://github.com/mamunhoque/laravel-crud-builder",
+        "docs": "https://github.com/mamunhoque/laravel-crud-builder#readme"
+    },
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0",
+        "illuminate/console": "^10.0|^11.0",
+        "illuminate/filesystem": "^10.0|^11.0",
+        "illuminate/database": "^10.0|^11.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "orchestra/testbench": "^8.0|^9.0",
+        "mockery/mockery": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "MamunHoque\\CrudBuilder\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MamunHoque\\CrudBuilder\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MamunHoque\\CrudBuilder\\CrudBuilderServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    }
+}

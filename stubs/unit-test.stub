@@ -1,0 +1,44 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Models\{{ modelName }};
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class {{ className }} extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    public function it_can_create_{{ modelVariable }}()
+    {
+        $data = {{ factoryData }};
+
+        ${{ modelVariable }} = {{ modelName }}::create($data);
+
+        $this->assertInstanceOf({{ modelName }}::class, ${{ modelVariable }});
+        $this->assertDatabaseHas('{{ tableName }}', $data);
+    }
+
+    /** @test */
+    public function it_has_fillable_attributes()
+    {
+        ${{ modelVariable }} = new {{ modelName }}();
+        
+        $this->assertIsArray(${{ modelVariable }}->getFillable());
+        $this->assertNotEmpty(${{ modelVariable }}->getFillable());
+    }
+
+    /** @test */
+    public function it_has_correct_table_name()
+    {
+        ${{ modelVariable }} = new {{ modelName }}();
+        
+        $this->assertEquals('{{ tableName }}', ${{ modelVariable }}->getTable());
+    }
+
+{{ relationshipTests }}
+
+{{ accessorTests }}
+}

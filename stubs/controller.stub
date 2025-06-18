@@ -1,0 +1,103 @@
+<?php
+
+namespace {{ namespace }};
+
+{{ uses }}
+
+class {{ className }} extends Controller
+{
+    use HelperTrait;
+
+    private {{ serviceName }} $service;
+
+    public function __construct({{ serviceName }} $service)
+    {
+        $this->service = $service;
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $data = $this->service->index($request);
+
+            return $this->successResponse($data, '{{ modelName }} data retrieved successfully!', Response::HTTP_OK);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), 'Something went wrong', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store({{ storeRequestName }} $request): JsonResponse
+    {
+        try {
+            $resource = $this->service->store($request);
+
+            return $this->successResponse(
+                new {{ resourceName }}($resource),
+                '{{ modelName }} created successfully!',
+                Response::HTTP_CREATED
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), $e->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), 'Failed to create {{ modelName }}', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $resource = $this->service->show($id);
+
+            return $this->successResponse(
+                new {{ resourceName }}($resource),
+                '{{ modelName }} retrieved successfully!',
+                Response::HTTP_OK
+            );
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), 'Failed to retrieve {{ modelName }}', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update({{ updateRequestName }} $request, int $id): JsonResponse
+    {
+        try {
+            $resource = $this->service->update($request, $id);
+
+            return $this->successResponse(
+                new {{ resourceName }}($resource),
+                '{{ modelName }} updated successfully!',
+                Response::HTTP_OK
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), $e->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), 'Failed to update {{ modelName }}', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $this->service->destroy($id);
+
+            return $this->successResponse(null, '{{ modelName }} deleted successfully!', Response::HTTP_OK);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), 'Failed to delete {{ modelName }}', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

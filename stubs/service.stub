@@ -1,0 +1,83 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Models\{{ modelName }};
+use App\Traits\HelperTrait;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+
+class {{ className }}
+{
+    use HelperTrait;
+
+    /**
+     * Get paginated list of {{ modelName }}
+     */
+    public function index($request): Collection|LengthAwarePaginator|array
+    {
+        $query = {{ modelName }}::query();
+{{ eagerLoad }}
+
+        // Select specific columns
+        $query->select(['*']);
+
+        // Sorting
+        $this->applySorting($query, $request);
+
+        // Searching
+        $searchKeys = {{ searchKeys }}; // Define the fields you want to search by
+        $this->applySearch($query, $request->input('search'), $searchKeys);
+{{ filters }}
+
+        // Pagination
+        return $this->paginateOrGet($query, $request);
+    }
+
+    /**
+     * Create a new {{ modelName }}
+     */
+    public function store(Request $request)
+    {
+        $data = $this->{{ prepareDataMethod }}($request);
+
+        return {{ modelName }}::create($data);
+    }
+
+    /**
+     * Get a specific {{ modelName }}
+     */
+    public function show(int $id): {{ modelName }}
+    {
+        return {{ modelName }}::findOrFail($id);
+    }
+
+    /**
+     * Update a {{ modelName }}
+     */
+    public function update($request, int $id)
+    {
+        ${{ modelVariable }} = {{ modelName }}::findOrFail($id);
+        $updateData = $this->{{ prepareDataMethod }}($request, false);
+
+        $updateData = array_filter($updateData, function ($value) {
+            return !is_null($value);
+        });
+
+        ${{ modelVariable }}->update($updateData);
+
+        return ${{ modelVariable }};
+    }
+
+    /**
+     * Delete a {{ modelName }}
+     */
+    public function destroy(int $id): bool
+    {
+        ${{ modelVariable }} = {{ modelName }}::findOrFail($id);
+        return ${{ modelVariable }}->delete();
+    }
+
+{{ prepareDataMethod }}
+}
