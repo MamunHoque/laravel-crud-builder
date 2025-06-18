@@ -73,8 +73,8 @@ class TestCase extends Orchestra
     protected function createTestMigrations(): void
     {
         $migrationsPath = database_path('migrations');
-        
-        if (!is_dir($migrationsPath)) {
+
+        if (! is_dir($migrationsPath)) {
             mkdir($migrationsPath, 0755, true);
         }
 
@@ -113,7 +113,7 @@ return new class extends Migration
 PHP;
 
         file_put_contents(
-            $migrationsPath . '/2024_01_01_000000_create_test_models_table.php',
+            $migrationsPath.'/2024_01_01_000000_create_test_models_table.php',
             $migrationContent
         );
 
@@ -145,7 +145,7 @@ return new class extends Migration
 PHP;
 
         file_put_contents(
-            $migrationsPath . '/2024_01_01_000001_create_categories_table.php',
+            $migrationsPath.'/2024_01_01_000001_create_categories_table.php',
             $categoriesMigrationContent
         );
     }
@@ -155,7 +155,7 @@ PHP;
         // Clean up test migration files
         $migrationsPath = database_path('migrations');
         if (is_dir($migrationsPath)) {
-            $files = glob($migrationsPath . '/*.php');
+            $files = glob($migrationsPath.'/*.php');
             foreach ($files as $file) {
                 unlink($file);
             }

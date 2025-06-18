@@ -8,6 +8,7 @@ use MamunHoque\CrudBuilder\CrudBuilder;
 class MakeTestCommand extends Command
 {
     protected $signature = 'make:crud-test {name} {--force}';
+
     protected $description = 'Generate comprehensive test files for CRUD operations';
 
     protected CrudBuilder $crudBuilder;
@@ -21,7 +22,7 @@ class MakeTestCommand extends Command
     public function handle(): int
     {
         $modelName = $this->argument('name');
-        
+
         try {
             $options = [
                 'model' => false,
@@ -35,15 +36,16 @@ class MakeTestCommand extends Command
             ];
 
             $results = $this->crudBuilder->build($modelName, $options);
-            
-            $this->info("✅ Test files generated successfully:");
+
+            $this->info('✅ Test files generated successfully:');
             foreach ($results['tests'] as $test) {
                 $this->line("   - {$test}");
             }
-            
+
             return self::SUCCESS;
         } catch (\Exception $e) {
             $this->error("❌ Error: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }

@@ -2,8 +2,8 @@
 
 namespace MamunHoque\CrudBuilder\Tests\Feature;
 
-use MamunHoque\CrudBuilder\Tests\TestCase;
 use Illuminate\Support\Facades\File;
+use MamunHoque\CrudBuilder\Tests\TestCase;
 
 class CommandsTest extends TestCase
 {
@@ -15,8 +15,8 @@ class CommandsTest extends TestCase
             '--force' => true,
             '--no-interaction' => true,
         ])
-        ->expectsConfirmation('Do you want to proceed with the generation?', 'yes')
-        ->assertExitCode(0);
+            ->expectsConfirmation('Do you want to proceed with the generation?', 'yes')
+            ->assertExitCode(0);
     }
 
     /** @test */
@@ -26,8 +26,8 @@ class CommandsTest extends TestCase
             'name' => 'TestModel',
             '--force' => true,
         ])
-        ->assertExitCode(0)
-        ->expectsOutput('✅ Model generated successfully:');
+            ->assertExitCode(0)
+            ->expectsOutput('✅ Model generated successfully:');
     }
 
     /** @test */
@@ -37,8 +37,8 @@ class CommandsTest extends TestCase
             'name' => 'TestModel',
             '--force' => true,
         ])
-        ->assertExitCode(0)
-        ->expectsOutput('✅ Service generated successfully:');
+            ->assertExitCode(0)
+            ->expectsOutput('✅ Service generated successfully:');
     }
 
     /** @test */
@@ -48,8 +48,8 @@ class CommandsTest extends TestCase
             'name' => 'TestModel',
             '--force' => true,
         ])
-        ->assertExitCode(0)
-        ->expectsOutput('✅ Controller generated successfully:');
+            ->assertExitCode(0)
+            ->expectsOutput('✅ Controller generated successfully:');
     }
 
     /** @test */
@@ -59,8 +59,8 @@ class CommandsTest extends TestCase
             'name' => 'TestModel',
             '--force' => true,
         ])
-        ->assertExitCode(0)
-        ->expectsOutput('✅ Request classes generated successfully:');
+            ->assertExitCode(0)
+            ->expectsOutput('✅ Request classes generated successfully:');
     }
 
     /** @test */
@@ -70,8 +70,8 @@ class CommandsTest extends TestCase
             'name' => 'TestModel',
             '--force' => true,
         ])
-        ->assertExitCode(0)
-        ->expectsOutput('✅ Resource generated successfully:');
+            ->assertExitCode(0)
+            ->expectsOutput('✅ Resource generated successfully:');
     }
 
     /** @test */
@@ -81,8 +81,8 @@ class CommandsTest extends TestCase
             'name' => 'TestModel',
             '--force' => true,
         ])
-        ->assertExitCode(0)
-        ->expectsOutput('✅ Test files generated successfully:');
+            ->assertExitCode(0)
+            ->expectsOutput('✅ Test files generated successfully:');
     }
 
     /** @test */
@@ -92,8 +92,8 @@ class CommandsTest extends TestCase
             'name' => 'NonExistentModel',
             '--force' => true,
         ])
-        ->assertExitCode(1)
-        ->expectsOutput('❌ Error: Migration file for table \'non_existent_models\' not found.');
+            ->assertExitCode(1)
+            ->expectsOutput('❌ Error: Migration file for table \'non_existent_models\' not found.');
     }
 
     /** @test */
@@ -108,8 +108,8 @@ class CommandsTest extends TestCase
             '--force' => true,
             '--no-interaction' => true,
         ])
-        ->expectsConfirmation('Do you want to proceed with the generation?', 'yes')
-        ->assertExitCode(0);
+            ->expectsConfirmation('Do you want to proceed with the generation?', 'yes')
+            ->assertExitCode(0);
     }
 
     /** @test */
@@ -119,9 +119,9 @@ class CommandsTest extends TestCase
             'name' => 'TestModel',
             '--no-interaction' => true,
         ])
-        ->expectsConfirmation('Do you want to proceed with the generation?', 'no')
-        ->expectsOutput('❌ CRUD generation cancelled.')
-        ->assertExitCode(1);
+            ->expectsConfirmation('Do you want to proceed with the generation?', 'no')
+            ->expectsOutput('❌ CRUD generation cancelled.')
+            ->assertExitCode(1);
     }
 
     protected function tearDown(): void

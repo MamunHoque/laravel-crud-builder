@@ -8,6 +8,7 @@ use MamunHoque\CrudBuilder\CrudBuilder;
 class MakeRequestCommand extends Command
 {
     protected $signature = 'make:crud-request {name} {--force}';
+
     protected $description = 'Generate request classes with intelligent validation rules';
 
     protected CrudBuilder $crudBuilder;
@@ -21,7 +22,7 @@ class MakeRequestCommand extends Command
     public function handle(): int
     {
         $modelName = $this->argument('name');
-        
+
         try {
             $options = [
                 'model' => false,
@@ -35,15 +36,16 @@ class MakeRequestCommand extends Command
             ];
 
             $results = $this->crudBuilder->build($modelName, $options);
-            
-            $this->info("✅ Request classes generated successfully:");
+
+            $this->info('✅ Request classes generated successfully:');
             foreach ($results['requests'] as $request) {
                 $this->line("   - {$request}");
             }
-            
+
             return self::SUCCESS;
         } catch (\Exception $e) {
             $this->error("❌ Error: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }

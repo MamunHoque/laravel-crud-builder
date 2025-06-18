@@ -20,12 +20,12 @@ class CrudBuilderServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/crud-builder.php',
+            __DIR__.'/../config/crud-builder.php',
             'crud-builder'
         );
 
         $this->app->singleton('crud-builder', function ($app) {
-            return new CrudBuilder();
+            return new CrudBuilder;
         });
     }
 
@@ -36,17 +36,17 @@ class CrudBuilderServiceProvider extends ServiceProvider
     {
         // Publish configuration
         $this->publishes([
-            __DIR__ . '/../config/crud-builder.php' => config_path('crud-builder.php'),
+            __DIR__.'/../config/crud-builder.php' => config_path('crud-builder.php'),
         ], 'crud-builder-config');
 
         // Publish stubs
         $this->publishes([
-            __DIR__ . '/../stubs' => resource_path('stubs/crud-builder'),
+            __DIR__.'/../stubs' => resource_path('stubs/crud-builder'),
         ], 'crud-builder-stubs');
 
         // Publish HelperTrait
         $this->publishes([
-            __DIR__ . '/Traits/HelperTrait.php' => app_path('Traits/HelperTrait.php'),
+            __DIR__.'/Traits/HelperTrait.php' => app_path('Traits/HelperTrait.php'),
         ], 'crud-builder-traits');
 
         // Auto-publish HelperTrait if it doesn't exist
@@ -75,15 +75,15 @@ class CrudBuilderServiceProvider extends ServiceProvider
         $targetPath = app_path('Traits/HelperTrait.php');
 
         // Check if HelperTrait already exists
-        if (!file_exists($targetPath)) {
+        if (! file_exists($targetPath)) {
             // Create the Traits directory if it doesn't exist
             $traitsDir = app_path('Traits');
-            if (!is_dir($traitsDir)) {
+            if (! is_dir($traitsDir)) {
                 mkdir($traitsDir, 0755, true);
             }
 
             // Copy the HelperTrait to the application
-            $sourcePath = __DIR__ . '/Traits/HelperTrait.php';
+            $sourcePath = __DIR__.'/Traits/HelperTrait.php';
             $content = file_get_contents($sourcePath);
 
             // Update the namespace to match the application

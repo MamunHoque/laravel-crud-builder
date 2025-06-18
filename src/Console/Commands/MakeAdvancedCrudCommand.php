@@ -3,8 +3,8 @@
 namespace MamunHoque\CrudBuilder\Console\Commands;
 
 use Illuminate\Console\Command;
-use MamunHoque\CrudBuilder\CrudBuilder;
 use Illuminate\Support\Facades\Artisan;
+use MamunHoque\CrudBuilder\CrudBuilder;
 
 class MakeAdvancedCrudCommand extends Command
 {
@@ -46,19 +46,20 @@ class MakeAdvancedCrudCommand extends Command
     public function handle(): int
     {
         $modelName = $this->argument('name');
-        
+
         $this->info("🚀 Starting Advanced CRUD generation for: {$modelName}");
         $this->newLine();
 
         try {
             $options = $this->buildOptions();
-            
+
             $this->info('📋 Configuration:');
             $this->displayOptions($options);
             $this->newLine();
 
-            if (!$this->confirm('Do you want to proceed with the generation?', true)) {
+            if (! $this->confirm('Do you want to proceed with the generation?', true)) {
                 $this->warn('❌ CRUD generation cancelled.');
+
                 return self::FAILURE;
             }
 
@@ -76,16 +77,16 @@ class MakeAdvancedCrudCommand extends Command
 
             $this->newLine();
             $this->info("✅ Advanced CRUD generation completed successfully for: {$modelName}");
-            
+
             return self::SUCCESS;
 
         } catch (\Exception $e) {
             $this->error("❌ Error: {$e->getMessage()}");
-            
+
             if ($this->option('verbose')) {
                 $this->error($e->getTraceAsString());
             }
-            
+
             return self::FAILURE;
         }
     }
@@ -96,7 +97,7 @@ class MakeAdvancedCrudCommand extends Command
     protected function buildOptions(): array
     {
         $config = config('crud-builder.defaults', []);
-        
+
         return [
             'model' => $this->option('model') || $this->option('all') || $config['generate_model'] ?? true,
             'controller' => $this->option('controller') || $this->option('all') || $config['generate_controller'] ?? true,
@@ -125,12 +126,12 @@ class MakeAdvancedCrudCommand extends Command
             }
         }
 
-        $this->line("   Components: " . implode(', ', $components));
+        $this->line('   Components: '.implode(', ', $components));
         $this->line("   Middleware: {$options['middleware']}");
         if ($options['prefix']) {
             $this->line("   Prefix: {$options['prefix']}");
         }
-        $this->line("   Force: " . ($options['force'] ? 'Yes' : 'No'));
+        $this->line('   Force: '.($options['force'] ? 'Yes' : 'No'));
     }
 
     /**
@@ -140,7 +141,7 @@ class MakeAdvancedCrudCommand extends Command
     {
         $this->newLine();
         $this->info('📁 Generated files:');
-        
+
         foreach ($results as $component => $result) {
             if (is_array($result)) {
                 foreach ($result as $file) {

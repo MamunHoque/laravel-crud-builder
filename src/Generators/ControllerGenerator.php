@@ -11,17 +11,17 @@ class ControllerGenerator extends BaseGenerator
      */
     public function generate(string $modelName, MigrationData $migrationData, array $options = []): array|string
     {
-        if (!$this->shouldGenerate('controller', $options)) {
+        if (! $this->shouldGenerate('controller', $options)) {
             return [];
         }
 
         $stub = $this->getStub('controller');
-        
+
         $controllerName = $migrationData->getControllerName();
         $serviceName = $migrationData->getServiceName();
         $requestNames = $migrationData->getRequestNames();
         $resourceName = $migrationData->getResourceName();
-        
+
         $replacements = [
             'namespace' => $this->getNamespace('controllers'),
             'className' => $controllerName,
@@ -37,12 +37,12 @@ class ControllerGenerator extends BaseGenerator
         ];
 
         $content = $this->replacePlaceholders($stub, $replacements);
-        
+
         $fileName = "{$controllerName}.php";
         $filePath = $this->getFilePath('controllers', $fileName);
-        
+
         $this->writeFile($filePath, $content, $options['force'] ?? false);
-        
+
         return $filePath;
     }
 
@@ -53,10 +53,10 @@ class ControllerGenerator extends BaseGenerator
     {
         $uses = [
             'App\Http\Controllers\Controller',
-            $this->getNamespace('requests') . '\\' . $requestNames['store'],
-            $this->getNamespace('requests') . '\\' . $requestNames['update'],
-            $this->getNamespace('services') . '\\' . $serviceName,
-            $this->getNamespace('resources') . '\\' . $resourceName,
+            $this->getNamespace('requests').'\\'.$requestNames['store'],
+            $this->getNamespace('requests').'\\'.$requestNames['update'],
+            $this->getNamespace('services').'\\'.$serviceName,
+            $this->getNamespace('resources').'\\'.$resourceName,
             'App\Traits\HelperTrait',
             'Illuminate\Http\JsonResponse',
             'Illuminate\Http\Request',

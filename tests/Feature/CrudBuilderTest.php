@@ -2,9 +2,9 @@
 
 namespace MamunHoque\CrudBuilder\Tests\Feature;
 
+use Illuminate\Support\Facades\File;
 use MamunHoque\CrudBuilder\CrudBuilder;
 use MamunHoque\CrudBuilder\Tests\TestCase;
-use Illuminate\Support\Facades\File;
 
 class CrudBuilderTest extends TestCase
 {
@@ -13,7 +13,7 @@ class CrudBuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->crudBuilder = new CrudBuilder();
+        $this->crudBuilder = new CrudBuilder;
     }
 
     /** @test */
@@ -110,7 +110,7 @@ class CrudBuilderTest extends TestCase
     public function it_can_get_migration_parser()
     {
         $parser = $this->crudBuilder->getMigrationParser();
-        
+
         $this->assertInstanceOf(\MamunHoque\CrudBuilder\Parsers\MigrationParser::class, $parser);
     }
 
@@ -118,7 +118,7 @@ class CrudBuilderTest extends TestCase
     public function it_can_get_generators()
     {
         $generators = $this->crudBuilder->getGenerators();
-        
+
         $this->assertIsArray($generators);
         $this->assertArrayHasKey('model', $generators);
         $this->assertArrayHasKey('controller', $generators);

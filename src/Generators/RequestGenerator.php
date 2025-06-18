@@ -11,7 +11,7 @@ class RequestGenerator extends BaseGenerator
      */
     public function generate(string $modelName, MigrationData $migrationData, array $options = []): array|string
     {
-        if (!$this->shouldGenerate('requests', $options)) {
+        if (! $this->shouldGenerate('requests', $options)) {
             return [];
         }
 
@@ -20,16 +20,16 @@ class RequestGenerator extends BaseGenerator
 
         // Generate Store Request
         $storeRequestPath = $this->generateStoreRequest(
-            $requestNames['store'], 
-            $migrationData, 
+            $requestNames['store'],
+            $migrationData,
             $options
         );
         $generatedFiles[] = $storeRequestPath;
 
         // Generate Update Request
         $updateRequestPath = $this->generateUpdateRequest(
-            $requestNames['update'], 
-            $migrationData, 
+            $requestNames['update'],
+            $migrationData,
             $options
         );
         $generatedFiles[] = $updateRequestPath;
@@ -43,9 +43,9 @@ class RequestGenerator extends BaseGenerator
     protected function generateStoreRequest(string $requestName, MigrationData $migrationData, array $options): string
     {
         $stub = $this->getStub('store-request');
-        
+
         $validationRules = $migrationData->getStoreValidationRules();
-        
+
         $replacements = [
             'namespace' => $this->getNamespace('requests'),
             'className' => $requestName,
@@ -54,12 +54,12 @@ class RequestGenerator extends BaseGenerator
         ];
 
         $content = $this->replacePlaceholders($stub, $replacements);
-        
+
         $fileName = "{$requestName}.php";
         $filePath = $this->getFilePath('requests', $fileName);
-        
+
         $this->writeFile($filePath, $content, $options['force'] ?? false);
-        
+
         return $filePath;
     }
 
@@ -69,9 +69,9 @@ class RequestGenerator extends BaseGenerator
     protected function generateUpdateRequest(string $requestName, MigrationData $migrationData, array $options): string
     {
         $stub = $this->getStub('update-request');
-        
+
         $validationRules = $this->getUpdateValidationRules($migrationData);
-        
+
         $replacements = [
             'namespace' => $this->getNamespace('requests'),
             'className' => $requestName,
@@ -81,12 +81,12 @@ class RequestGenerator extends BaseGenerator
         ];
 
         $content = $this->replacePlaceholders($stub, $replacements);
-        
+
         $fileName = "{$requestName}.php";
         $filePath = $this->getFilePath('requests', $fileName);
-        
+
         $this->writeFile($filePath, $content, $options['force'] ?? false);
-        
+
         return $filePath;
     }
 
@@ -96,7 +96,7 @@ class RequestGenerator extends BaseGenerator
     protected function getUpdateValidationRules(MigrationData $migrationData): array
     {
         $rules = $migrationData->getUpdateValidationRules();
-        
+
         // Modify unique rules for update requests
         foreach ($rules as $field => &$fieldRules) {
             if (is_array($fieldRules)) {
@@ -112,7 +112,7 @@ class RequestGenerator extends BaseGenerator
                 }
             }
         }
-        
+
         return $rules;
     }
 }

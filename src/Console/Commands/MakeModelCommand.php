@@ -8,6 +8,7 @@ use MamunHoque\CrudBuilder\CrudBuilder;
 class MakeModelCommand extends Command
 {
     protected $signature = 'make:crud-model {name} {--force}';
+
     protected $description = 'Generate model with intelligent migration parsing';
 
     protected CrudBuilder $crudBuilder;
@@ -21,7 +22,7 @@ class MakeModelCommand extends Command
     public function handle(): int
     {
         $modelName = $this->argument('name');
-        
+
         try {
             $options = [
                 'model' => true,
@@ -35,12 +36,13 @@ class MakeModelCommand extends Command
             ];
 
             $results = $this->crudBuilder->build($modelName, $options);
-            
+
             $this->info("✅ Model generated successfully: {$results['model']}");
-            
+
             return self::SUCCESS;
         } catch (\Exception $e) {
             $this->error("❌ Error: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }

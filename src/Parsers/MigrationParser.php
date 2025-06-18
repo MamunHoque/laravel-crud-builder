@@ -11,6 +11,7 @@ use MamunHoque\CrudBuilder\Data\RelationshipData;
 class MigrationParser
 {
     protected Filesystem $filesystem;
+
     protected array $columnTypes = [
         'bigIncrements', 'bigInteger', 'binary', 'boolean', 'char', 'dateTimeTz', 'dateTime',
         'date', 'decimal', 'double', 'enum', 'float', 'foreignId', 'foreignIdFor', 'foreignUlid',
@@ -22,12 +23,12 @@ class MigrationParser
         'string', 'text', 'timeTz', 'time', 'timestampTz', 'timestamp', 'timestampsTz', 'timestamps',
         'tinyIncrements', 'tinyInteger', 'tinyText', 'unsignedBigInteger', 'unsignedDecimal',
         'unsignedInteger', 'unsignedMediumInteger', 'unsignedSmallInteger', 'unsignedTinyInteger',
-        'ulidMorphs', 'ulid', 'uuidMorphs', 'uuid', 'year'
+        'ulidMorphs', 'ulid', 'uuidMorphs', 'uuid', 'year',
     ];
 
     public function __construct()
     {
-        $this->filesystem = new Filesystem();
+        $this->filesystem = new Filesystem;
     }
 
     /**
@@ -36,13 +37,13 @@ class MigrationParser
     public function parse(string $tableName): ?MigrationData
     {
         $migrationFile = $this->findMigrationFile($tableName);
-        
-        if (!$migrationFile) {
+
+        if (! $migrationFile) {
             return null;
         }
 
         $content = $this->filesystem->get($migrationFile);
-        
+
         return $this->parseMigrationContent($content, $tableName);
     }
 
@@ -52,16 +53,16 @@ class MigrationParser
     protected function findMigrationFile(string $tableName): ?string
     {
         $migrationsPath = database_path('migrations');
-        
-        if (!$this->filesystem->isDirectory($migrationsPath)) {
+
+        if (! $this->filesystem->isDirectory($migrationsPath)) {
             return null;
         }
 
         $files = $this->filesystem->files($migrationsPath);
-        
+
         foreach ($files as $file) {
             $filename = $file->getFilename();
-            
+
             // Look for create table migrations
             if (Str::contains($filename, "create_{$tableName}_table")) {
                 return $file->getPathname();
@@ -77,28 +78,28 @@ class MigrationParser
     protected function parseMigrationContent(string $content, string $tableName): MigrationData
     {
         $migrationData = new MigrationData($tableName);
-        
+
         // Extract the Schema::create block
-        $schemaPattern = '/Schema::create\s*\(\s*[\'"]' . preg_quote($tableName) . '[\'"]\s*,\s*function\s*\(\s*\$?table\s*\)\s*\{(.*?)\}\s*\);/s';
-        
+        $schemaPattern = '/Schema::create\s*\(\s*[\'"]'.preg_quote($tableName).'[\'"]\s*,\s*function\s*\(\s*\$?table\s*\)\s*\{(.*?)\}\s*\);/s';
+
         if (preg_match($schemaPattern, $content, $matches)) {
             $tableDefinition = $matches[1];
-            
+
             // Parse columns
             $columns = $this->parseColumns($tableDefinition);
             $migrationData->setColumns($columns);
-            
+
             // Parse relationships
             $relationships = $this->parseRelationships($tableDefinition);
             $migrationData->setRelationships($relationships);
-            
+
             // Parse indexes
             $indexes = $this->parseIndexes($tableDefinition);
             $migrationData->setIndexes($indexes);
-            
+
             // Check for soft deletes
             $migrationData->setHasSoftDeletes($this->hasSoftDeletes($tableDefinition));
-            
+
             // Check for timestamps
             $migrationData->setHasTimestamps($this->hasTimestamps($tableDefinition));
         }
@@ -112,23 +113,23 @@ class MigrationParser
     protected function parseColumns(string $tableDefinition): array
     {
         $columns = [];
-        
+
         // Enhanced regex to capture column definitions with chained methods
         $pattern = '/\$table->(\w+)\s*\(\s*([^)]*)\s*\)([^;]*);/';
-        
+
         if (preg_match_all($pattern, $tableDefinition, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $columnType = $match[1];
                 $parameters = $this->parseParameters($match[2]);
                 $chainedMethods = $this->parseChainedMethods($match[3]);
-                
+
                 // Skip non-column methods
-                if (!in_array($columnType, $this->columnTypes)) {
+                if (! in_array($columnType, $this->columnTypes)) {
                     continue;
                 }
-                
+
                 $columnName = $parameters[0] ?? null;
-                
+
                 if ($columnName) {
                     $columnData = new ColumnData(
                         name: trim($columnName, '\'"'),
@@ -142,12 +143,12 @@ class MigrationParser
                         comment: $this->extractComment($chainedMethods),
                         enumValues: $this->extractEnumValues($columnType, $parameters)
                     );
-                    
+
                     $columns[] = $columnData;
                 }
             }
         }
-        
+
         return $columns;
     }
 
@@ -159,9 +160,10 @@ class MigrationParser
         if (empty(trim($paramString))) {
             return [];
         }
-        
+
         // Simple parameter parsing - can be enhanced for complex cases
         $params = explode(',', $paramString);
+
         return array_map('trim', $params);
     }
 
@@ -171,19 +173,19 @@ class MigrationParser
     protected function parseChainedMethods(string $chainString): array
     {
         $methods = [];
-        
+
         // Match chained method calls
         if (preg_match_all('/->(\w+)\s*\(([^)]*)\)/', $chainString, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $methods[] = $match[1];
-                
+
                 // Store method with parameters for complex parsing
-                if (!empty($match[2])) {
+                if (! empty($match[2])) {
                     $methods[$match[1]] = trim($match[2], '\'"');
                 }
             }
         }
-        
+
         return $methods;
     }
 
@@ -193,10 +195,10 @@ class MigrationParser
     protected function parseRelationships(string $tableDefinition): array
     {
         $relationships = [];
-        
+
         // Parse foreign key constraints
         $foreignPattern = '/\$table->foreign\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)\s*->references\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)\s*->on\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)/';
-        
+
         if (preg_match_all($foreignPattern, $tableDefinition, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $relationships[] = new RelationshipData(
@@ -207,18 +209,18 @@ class MigrationParser
                 );
             }
         }
-        
+
         // Parse foreignId columns
         $foreignIdPattern = '/\$table->foreignId\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)/';
-        
+
         if (preg_match_all($foreignIdPattern, $tableDefinition, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $columnName = $match[1];
-                
+
                 // Infer table name from column name (e.g., user_id -> users)
                 if (Str::endsWith($columnName, '_id')) {
                     $relatedTable = Str::plural(Str::before($columnName, '_id'));
-                    
+
                     $relationships[] = new RelationshipData(
                         localKey: $columnName,
                         foreignKey: 'id',
@@ -228,7 +230,7 @@ class MigrationParser
                 }
             }
         }
-        
+
         return $relationships;
     }
 
@@ -238,19 +240,19 @@ class MigrationParser
     protected function parseIndexes(string $tableDefinition): array
     {
         $indexes = [];
-        
+
         // Parse explicit index definitions
         $indexPattern = '/\$table->index\s*\(\s*([^)]+)\s*\)/';
-        
+
         if (preg_match_all($indexPattern, $tableDefinition, $matches)) {
             foreach ($matches[1] as $indexDef) {
                 $indexes[] = [
                     'type' => 'index',
-                    'columns' => $this->parseIndexColumns($indexDef)
+                    'columns' => $this->parseIndexColumns($indexDef),
                 ];
             }
         }
-        
+
         return $indexes;
     }
 
@@ -259,7 +261,7 @@ class MigrationParser
      */
     protected function hasSoftDeletes(string $tableDefinition): bool
     {
-        return Str::contains($tableDefinition, '->softDeletes()') || 
+        return Str::contains($tableDefinition, '->softDeletes()') ||
                Str::contains($tableDefinition, '->softDeletesTz()');
     }
 
@@ -268,7 +270,7 @@ class MigrationParser
      */
     protected function hasTimestamps(string $tableDefinition): bool
     {
-        return Str::contains($tableDefinition, '->timestamps()') || 
+        return Str::contains($tableDefinition, '->timestamps()') ||
                Str::contains($tableDefinition, '->timestampsTz()') ||
                Str::contains($tableDefinition, '->nullableTimestamps()');
     }
@@ -290,7 +292,7 @@ class MigrationParser
         if (count($parameters) > 1 && is_numeric($parameters[1])) {
             return (int) $parameters[1];
         }
-        
+
         return null;
     }
 
@@ -313,9 +315,10 @@ class MigrationParser
             for ($i = 1; $i < count($parameters); $i++) {
                 $enumValues[] = trim($parameters[$i], '\'"');
             }
+
             return $enumValues;
         }
-        
+
         return null;
     }
 
@@ -327,11 +330,12 @@ class MigrationParser
         // Simple parsing - can be enhanced
         if (Str::startsWith($indexDef, '[') && Str::endsWith($indexDef, ']')) {
             $columns = trim($indexDef, '[]');
-            return array_map(function($col) {
+
+            return array_map(function ($col) {
                 return trim($col, '\'" ');
             }, explode(',', $columns));
         }
-        
+
         return [trim($indexDef, '\'"')];
     }
 }

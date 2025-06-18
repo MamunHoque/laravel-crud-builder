@@ -5,9 +5,13 @@ namespace MamunHoque\CrudBuilder\Data;
 class MigrationData
 {
     protected array $columns = [];
+
     protected array $relationships = [];
+
     protected array $indexes = [];
+
     protected bool $hasSoftDeletes = false;
+
     protected bool $hasTimestamps = false;
 
     public function __construct(
@@ -36,7 +40,7 @@ class MigrationData
      */
     public function getFillableColumns(): array
     {
-        return array_filter($this->columns, fn(ColumnData $column) => $column->isFillable());
+        return array_filter($this->columns, fn (ColumnData $column) => $column->isFillable());
     }
 
     /**
@@ -44,7 +48,7 @@ class MigrationData
      */
     public function getSearchableColumns(): array
     {
-        return array_filter($this->columns, fn(ColumnData $column) => $column->isSearchable());
+        return array_filter($this->columns, fn (ColumnData $column) => $column->isSearchable());
     }
 
     /**
@@ -52,7 +56,7 @@ class MigrationData
      */
     public function getForeignKeyColumns(): array
     {
-        return array_filter($this->columns, fn(ColumnData $column) => $column->isForeignKey());
+        return array_filter($this->columns, fn (ColumnData $column) => $column->isForeignKey());
     }
 
     /**
@@ -60,7 +64,7 @@ class MigrationData
      */
     public function getAccessorColumns(): array
     {
-        return array_filter($this->columns, fn(ColumnData $column) => $column->shouldHaveAccessor());
+        return array_filter($this->columns, fn (ColumnData $column) => $column->shouldHaveAccessor());
     }
 
     /**
@@ -68,7 +72,7 @@ class MigrationData
      */
     public function getCastableColumns(): array
     {
-        return array_filter($this->columns, fn(ColumnData $column) => $column->getCastType() !== null);
+        return array_filter($this->columns, fn (ColumnData $column) => $column->getCastType() !== null);
     }
 
     /**
@@ -92,7 +96,7 @@ class MigrationData
      */
     public function getBelongsToRelationships(): array
     {
-        return array_filter($this->relationships, fn(RelationshipData $rel) => $rel->type === 'belongsTo');
+        return array_filter($this->relationships, fn (RelationshipData $rel) => $rel->type === 'belongsTo');
     }
 
     /**
@@ -100,7 +104,7 @@ class MigrationData
      */
     public function getEagerLoadRelationships(): array
     {
-        return array_filter($this->relationships, fn(RelationshipData $rel) => $rel->shouldEagerLoad());
+        return array_filter($this->relationships, fn (RelationshipData $rel) => $rel->shouldEagerLoad());
     }
 
     /**
@@ -164,7 +168,7 @@ class MigrationData
      */
     public function getControllerName(): string
     {
-        return $this->getModelName() . 'Controller';
+        return $this->getModelName().'Controller';
     }
 
     /**
@@ -172,7 +176,7 @@ class MigrationData
      */
     public function getServiceName(): string
     {
-        return $this->getModelName() . 'Service';
+        return $this->getModelName().'Service';
     }
 
     /**
@@ -180,7 +184,7 @@ class MigrationData
      */
     public function getResourceName(): string
     {
-        return $this->getModelName() . 'Resource';
+        return $this->getModelName().'Resource';
     }
 
     /**
@@ -189,9 +193,10 @@ class MigrationData
     public function getRequestNames(): array
     {
         $modelName = $this->getModelName();
+
         return [
             'store' => "Store{$modelName}Request",
-            'update' => "Update{$modelName}Request"
+            'update' => "Update{$modelName}Request",
         ];
     }
 
@@ -201,11 +206,11 @@ class MigrationData
     public function getStoreValidationRules(): array
     {
         $rules = [];
-        
+
         foreach ($this->getFillableColumns() as $column) {
             $rules[$column->name] = $column->getValidationRules(false);
         }
-        
+
         return $rules;
     }
 
@@ -215,11 +220,11 @@ class MigrationData
     public function getUpdateValidationRules(): array
     {
         $rules = [];
-        
+
         foreach ($this->getFillableColumns() as $column) {
             $rules[$column->name] = $column->getValidationRules(true);
         }
-        
+
         return $rules;
     }
 
@@ -251,11 +256,11 @@ class MigrationData
     public function getModelTraits(): array
     {
         $traits = ['HasFactory'];
-        
+
         if ($this->hasSoftDeletes()) {
             $traits[] = 'SoftDeletes';
         }
-        
+
         return $traits;
     }
 
@@ -267,8 +272,8 @@ class MigrationData
         return [
             'tableName' => $this->tableName,
             'migrationFile' => $this->migrationFile,
-            'columns' => array_map(fn(ColumnData $col) => $col->toArray(), $this->columns),
-            'relationships' => array_map(fn(RelationshipData $rel) => $rel->toArray(), $this->relationships),
+            'columns' => array_map(fn (ColumnData $col) => $col->toArray(), $this->columns),
+            'relationships' => array_map(fn (RelationshipData $rel) => $rel->toArray(), $this->relationships),
             'indexes' => $this->indexes,
             'hasSoftDeletes' => $this->hasSoftDeletes,
             'hasTimestamps' => $this->hasTimestamps,

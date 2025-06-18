@@ -8,6 +8,7 @@ use MamunHoque\CrudBuilder\CrudBuilder;
 class MakeResourceCommand extends Command
 {
     protected $signature = 'make:crud-resource {name} {--force}';
+
     protected $description = 'Generate API resource with intelligent field mapping';
 
     protected CrudBuilder $crudBuilder;
@@ -21,7 +22,7 @@ class MakeResourceCommand extends Command
     public function handle(): int
     {
         $modelName = $this->argument('name');
-        
+
         try {
             $options = [
                 'model' => false,
@@ -35,12 +36,13 @@ class MakeResourceCommand extends Command
             ];
 
             $results = $this->crudBuilder->build($modelName, $options);
-            
+
             $this->info("✅ Resource generated successfully: {$results['resource']}");
-            
+
             return self::SUCCESS;
         } catch (\Exception $e) {
             $this->error("❌ Error: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }

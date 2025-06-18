@@ -31,7 +31,7 @@ trait HelperTrait
         if ($searchValue) {
             $query->where(function ($query) use ($searchValue, $searchKeys) {
                 foreach ($searchKeys as $key) {
-                    $query->orWhereRaw('LOWER(' . $key . ') LIKE ?', ['%' . strtolower($searchValue) . '%']);
+                    $query->orWhereRaw('LOWER('.$key.') LIKE ?', ['%'.strtolower($searchValue).'%']);
                 }
             });
         }
@@ -56,7 +56,7 @@ trait HelperTrait
                 'total_items' => $items->total(),
                 'total_pages' => $items->lastPage(),
             ];
-        } elseif (!empty($request->input('per_page'))) {
+        } elseif (! empty($request->input('per_page'))) {
             $query->take($request->input('per_page'));
         }
 
@@ -70,7 +70,7 @@ trait HelperTrait
     {
         return $query->when($request->has('is_active'), function ($q) use ($request) {
             $isActive = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            if (!is_null($isActive)) {
+            if (! is_null($isActive)) {
                 $q->where('is_active', $isActive);
             }
         });
@@ -82,7 +82,7 @@ trait HelperTrait
     private function applyFilters($query, $request, $filters)
     {
         foreach ($filters as $key => $operator) {
-            if (!$request->filled($key)) {
+            if (! $request->filled($key)) {
                 continue;
             }
 
@@ -128,16 +128,16 @@ trait HelperTrait
      */
     protected function s3FileUpload($request, $fileName, $path)
     {
-        if (!$request->hasFile($fileName)) {
+        if (! $request->hasFile($fileName)) {
             return '';
         }
 
         try {
             $file = $request->file($fileName);
-            $path = rtrim($path, '/') . '/';
+            $path = rtrim($path, '/').'/';
             $extension = $file->getClientOriginalExtension();
-            $uniqueName = Str::uuid() . '.' . $extension;
-            $key = $path . $uniqueName;
+            $uniqueName = Str::uuid().'.'.$extension;
+            $key = $path.$uniqueName;
 
             // Use Laravel's Storage facade for S3 upload
             $uploaded = Storage::disk('s3')->put($key, file_get_contents($file->getPathname()));
@@ -151,8 +151,8 @@ trait HelperTrait
 
             return '';
         } catch (\Exception $e) {
-            \Log::error('S3 Upload error: ' . $e->getMessage());
-            throw new \Exception('S3 Upload error: ' . $e->getMessage());
+            \Log::error('S3 Upload error: '.$e->getMessage());
+            throw new \Exception('S3 Upload error: '.$e->getMessage());
         }
     }
 
@@ -161,7 +161,7 @@ trait HelperTrait
      */
     protected function localFileUpload($request, $fileName, $path): bool|string
     {
-        if (!$request->hasFile($fileName)) {
+        if (! $request->hasFile($fileName)) {
             return '';
         }
 
@@ -176,8 +176,8 @@ trait HelperTrait
 
             return '';
         } catch (\Exception $e) {
-            \Log::error('File upload error: ' . $e->getMessage());
-            throw new \Exception('File upload error: ' . $e->getMessage());
+            \Log::error('File upload error: '.$e->getMessage());
+            throw new \Exception('File upload error: '.$e->getMessage());
         }
     }
 
@@ -186,7 +186,7 @@ trait HelperTrait
      */
     protected function uploadMultipleFiles(Request $request, $fileName, $path)
     {
-        if (!$request->hasFile($fileName)) {
+        if (! $request->hasFile($fileName)) {
             return [];
         }
 
@@ -194,15 +194,15 @@ trait HelperTrait
             $files = $request->file($fileName);
             $path = rtrim($path, '/');
             $filePaths = [];
-            
+
             foreach ($files as $file) {
                 $filePaths[] = Storage::disk('public')->put($path, $file);
             }
 
             return $filePaths;
         } catch (\Exception $e) {
-            \Log::error('File upload error: ' . $e->getMessage());
-            throw new \Exception('File upload error: ' . $e->getMessage());
+            \Log::error('File upload error: '.$e->getMessage());
+            throw new \Exception('File upload error: '.$e->getMessage());
         }
     }
 
@@ -214,7 +214,7 @@ trait HelperTrait
         $parts = explode('_', $input);
         $classNameParts = array_map('ucfirst', $parts);
 
-        return 'App\Models\\' . implode('', $classNameParts);
+        return 'App\Models\\'.implode('', $classNameParts);
     }
 
     /**

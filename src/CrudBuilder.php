@@ -2,40 +2,48 @@
 
 namespace MamunHoque\CrudBuilder;
 
-use MamunHoque\CrudBuilder\Parsers\MigrationParser;
-use MamunHoque\CrudBuilder\Generators\ModelGenerator;
+use Illuminate\Support\Str;
 use MamunHoque\CrudBuilder\Generators\ControllerGenerator;
-use MamunHoque\CrudBuilder\Generators\ServiceGenerator;
+use MamunHoque\CrudBuilder\Generators\FactoryGenerator;
+use MamunHoque\CrudBuilder\Generators\ModelGenerator;
 use MamunHoque\CrudBuilder\Generators\RequestGenerator;
 use MamunHoque\CrudBuilder\Generators\ResourceGenerator;
-use MamunHoque\CrudBuilder\Generators\TestGenerator;
 use MamunHoque\CrudBuilder\Generators\RouteGenerator;
-use MamunHoque\CrudBuilder\Generators\FactoryGenerator;
-use Illuminate\Support\Str;
+use MamunHoque\CrudBuilder\Generators\ServiceGenerator;
+use MamunHoque\CrudBuilder\Generators\TestGenerator;
+use MamunHoque\CrudBuilder\Parsers\MigrationParser;
 
 class CrudBuilder
 {
     protected MigrationParser $migrationParser;
+
     protected ModelGenerator $modelGenerator;
+
     protected ControllerGenerator $controllerGenerator;
+
     protected ServiceGenerator $serviceGenerator;
+
     protected RequestGenerator $requestGenerator;
+
     protected ResourceGenerator $resourceGenerator;
+
     protected TestGenerator $testGenerator;
+
     protected RouteGenerator $routeGenerator;
+
     protected FactoryGenerator $factoryGenerator;
 
     public function __construct()
     {
-        $this->migrationParser = new MigrationParser();
-        $this->modelGenerator = new ModelGenerator();
-        $this->controllerGenerator = new ControllerGenerator();
-        $this->serviceGenerator = new ServiceGenerator();
-        $this->requestGenerator = new RequestGenerator();
-        $this->resourceGenerator = new ResourceGenerator();
-        $this->testGenerator = new TestGenerator();
-        $this->routeGenerator = new RouteGenerator();
-        $this->factoryGenerator = new FactoryGenerator();
+        $this->migrationParser = new MigrationParser;
+        $this->modelGenerator = new ModelGenerator;
+        $this->controllerGenerator = new ControllerGenerator;
+        $this->serviceGenerator = new ServiceGenerator;
+        $this->requestGenerator = new RequestGenerator;
+        $this->resourceGenerator = new ResourceGenerator;
+        $this->testGenerator = new TestGenerator;
+        $this->routeGenerator = new RouteGenerator;
+        $this->factoryGenerator = new FactoryGenerator;
     }
 
     /**
@@ -44,11 +52,11 @@ class CrudBuilder
     public function build(string $modelName, array $options = []): array
     {
         $tableName = Str::plural(Str::snake($modelName));
-        
+
         // Parse migration to get table structure
         $migrationData = $this->migrationParser->parse($tableName);
-        
-        if (!$migrationData) {
+
+        if (! $migrationData) {
             throw new \Exception("Migration file for table '{$tableName}' not found.");
         }
 

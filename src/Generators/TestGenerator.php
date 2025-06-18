@@ -11,7 +11,7 @@ class TestGenerator extends BaseGenerator
      */
     public function generate(string $modelName, MigrationData $migrationData, array $options = []): array|string
     {
-        if (!$this->shouldGenerate('tests', $options)) {
+        if (! $this->shouldGenerate('tests', $options)) {
             return [];
         }
 
@@ -38,11 +38,11 @@ class TestGenerator extends BaseGenerator
     protected function generateFeatureTest(string $modelName, MigrationData $migrationData, array $options): string
     {
         $stub = $this->getStub('feature-test');
-        
+
         $testClassName = "{$modelName}ControllerTest";
         $controllerName = $migrationData->getControllerName();
         $resourceName = $this->plural($this->kebab($modelName));
-        
+
         $replacements = [
             'namespace' => $this->getNamespace('tests'),
             'className' => $testClassName,
@@ -57,12 +57,12 @@ class TestGenerator extends BaseGenerator
         ];
 
         $content = $this->replacePlaceholders($stub, $replacements);
-        
+
         $fileName = "{$testClassName}.php";
         $filePath = $this->getFilePath('tests', $fileName);
-        
+
         $this->writeFile($filePath, $content, $options['force'] ?? false);
-        
+
         return $filePath;
     }
 
@@ -72,9 +72,9 @@ class TestGenerator extends BaseGenerator
     protected function generateUnitTest(string $modelName, MigrationData $migrationData, array $options): string
     {
         $stub = $this->getStub('unit-test');
-        
+
         $testClassName = "{$modelName}Test";
-        
+
         $replacements = [
             'namespace' => $this->getNamespace('unit_tests'),
             'className' => $testClassName,
@@ -86,12 +86,12 @@ class TestGenerator extends BaseGenerator
         ];
 
         $content = $this->replacePlaceholders($stub, $replacements);
-        
+
         $fileName = "{$testClassName}.php";
         $filePath = $this->getFilePath('unit_tests', $fileName);
-        
+
         $this->writeFile($filePath, $content, $options['force'] ?? false);
-        
+
         return $filePath;
     }
 
@@ -102,11 +102,11 @@ class TestGenerator extends BaseGenerator
     {
         $fillableColumns = $migrationData->getFillableColumns();
         $factoryData = [];
-        
+
         foreach ($fillableColumns as $column) {
             $factoryData[$column->name] = $this->generateFactoryValue($column);
         }
-        
+
         return $this->arrayToString($factoryData, 12);
     }
 
@@ -137,14 +137,18 @@ class TestGenerator extends BaseGenerator
             case 'enum':
                 if ($column->enumValues) {
                     $values = implode("', '", $column->enumValues);
+
                     return "fake()->randomElement(['{$values}'])";
                 }
+
                 return 'fake()->word()';
             default:
                 if ($column->isForeignKey()) {
                     $relatedModel = $this->studly($this->singular($column->getForeignTableName()));
+
                     return "{$relatedModel}::factory()->create()->id";
                 }
+
                 return 'fake()->word()';
         }
     }
@@ -156,11 +160,11 @@ class TestGenerator extends BaseGenerator
     {
         $fillableColumns = array_slice($migrationData->getFillableColumns(), 0, 3); // Just a few fields
         $updateData = [];
-        
+
         foreach ($fillableColumns as $column) {
             $updateData[$column->name] = $this->generateFactoryValue($column);
         }
-        
+
         return $this->arrayToString($updateData, 12);
     }
 
@@ -170,29 +174,29 @@ class TestGenerator extends BaseGenerator
     protected function generateValidationTests(MigrationData $migrationData): string
     {
         $requiredFields = [];
-        
+
         foreach ($migrationData->getFillableColumns() as $column) {
             $rules = $column->getValidationRules(false);
             if (in_array('required', $rules)) {
                 $requiredFields[] = $column->name;
             }
         }
-        
+
         if (empty($requiredFields)) {
             return '';
         }
-        
+
         $tests = [];
         foreach ($requiredFields as $field) {
-            $tests[] = "    /** @test */\n" .
-                      "    public function it_requires_{$field}_field()\n" .
-                      "    {\n" .
-                      "        \$response = \$this->postJson(route('{{ routePrefix }}{{ resourceName }}.store'), []);\n" .
-                      "        \$response->assertStatus(422)\n" .
-                      "                 ->assertJsonValidationErrors('{$field}');\n" .
-                      "    }";
+            $tests[] = "    /** @test */\n".
+                      "    public function it_requires_{$field}_field()\n".
+                      "    {\n".
+                      "        \$response = \$this->postJson(route('{{ routePrefix }}{{ resourceName }}.store'), []);\n".
+                      "        \$response->assertStatus(422)\n".
+                      "                 ->assertJsonValidationErrors('{$field}');\n".
+                      '    }';
         }
-        
+
         return implode("\n\n", $tests);
     }
 
@@ -202,24 +206,24 @@ class TestGenerator extends BaseGenerator
     protected function generateRelationshipTests(MigrationData $migrationData): string
     {
         $relationships = $migrationData->getRelationships();
-        
+
         if (empty($relationships)) {
             return '';
         }
-        
+
         $tests = [];
         foreach ($relationships as $relationship) {
             $relationshipName = $relationship->relationshipName;
             $relatedModel = $relationship->relatedModel;
-            
-            $tests[] = "    /** @test */\n" .
-                      "    public function it_belongs_to_{$relationshipName}()\n" .
-                      "    {\n" .
-                      "        \${{ modelVariable }} = {{ modelName }}::factory()->create();\n" .
-                      "        \$this->assertInstanceOf({$relatedModel}::class, \${{ modelVariable }}->{$relationshipName});\n" .
-                      "    }";
+
+            $tests[] = "    /** @test */\n".
+                      "    public function it_belongs_to_{$relationshipName}()\n".
+                      "    {\n".
+                      "        \${{ modelVariable }} = {{ modelName }}::factory()->create();\n".
+                      "        \$this->assertInstanceOf({$relatedModel}::class, \${{ modelVariable }}->{$relationshipName});\n".
+                      '    }';
         }
-        
+
         return implode("\n\n", $tests);
     }
 
@@ -229,27 +233,27 @@ class TestGenerator extends BaseGenerator
     protected function generateAccessorTests(MigrationData $migrationData): string
     {
         $accessorColumns = $migrationData->getAccessorColumns();
-        
+
         if (empty($accessorColumns)) {
             return '';
         }
-        
+
         $tests = [];
         foreach ($accessorColumns as $column) {
-            $accessorName = $this->snake($column->name) . '_url';
-            
-            $tests[] = "    /** @test */\n" .
-                      "    public function it_has_{$accessorName}_accessor()\n" .
-                      "    {\n" .
-                      "        \${{ modelVariable }} = {{ modelName }}::factory()->create([\n" .
-                      "            '{$column->name}' => 'test-file.jpg'\n" .
-                      "        ]);\n" .
-                      "        \n" .
-                      "        \$this->assertNotNull(\${{ modelVariable }}->{$accessorName});\n" .
-                      "        \$this->assertStringContainsString('test-file.jpg', \${{ modelVariable }}->{$accessorName});\n" .
-                      "    }";
+            $accessorName = $this->snake($column->name).'_url';
+
+            $tests[] = "    /** @test */\n".
+                      "    public function it_has_{$accessorName}_accessor()\n".
+                      "    {\n".
+                      "        \${{ modelVariable }} = {{ modelName }}::factory()->create([\n".
+                      "            '{$column->name}' => 'test-file.jpg'\n".
+                      "        ]);\n".
+                      "        \n".
+                      "        \$this->assertNotNull(\${{ modelVariable }}->{$accessorName});\n".
+                      "        \$this->assertStringContainsString('test-file.jpg', \${{ modelVariable }}->{$accessorName});\n".
+                      '    }';
         }
-        
+
         return implode("\n\n", $tests);
     }
 
@@ -261,7 +265,7 @@ class TestGenerator extends BaseGenerator
         $middleware = $options['middleware'] ?? 'admin';
         $prefixes = $this->config['routes']['prefix'] ?? [];
         $prefix = $prefixes[$middleware] ?? '';
-        
-        return $prefix ? $prefix . '.' : '';
+
+        return $prefix ? $prefix.'.' : '';
     }
 }

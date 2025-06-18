@@ -9,11 +9,12 @@ use MamunHoque\CrudBuilder\Data\MigrationData;
 abstract class BaseGenerator
 {
     protected Filesystem $filesystem;
+
     protected array $config;
 
     public function __construct()
     {
-        $this->filesystem = new Filesystem();
+        $this->filesystem = new Filesystem;
         $this->config = config('crud-builder', []);
     }
 
@@ -28,11 +29,11 @@ abstract class BaseGenerator
     protected function getStub(string $stubName): string
     {
         $stubPath = $this->getStubPath($stubName);
-        
-        if (!$this->filesystem->exists($stubPath)) {
+
+        if (! $this->filesystem->exists($stubPath)) {
             throw new \Exception("Stub file not found: {$stubPath}");
         }
-        
+
         return $this->filesystem->get($stubPath);
     }
 
@@ -46,9 +47,9 @@ abstract class BaseGenerator
         if ($this->filesystem->exists($publishedStubPath)) {
             return $publishedStubPath;
         }
-        
+
         // Fall back to package stubs
-        return __DIR__ . "/../../stubs/{$stubName}.stub";
+        return __DIR__."/../../stubs/{$stubName}.stub";
     }
 
     /**
@@ -59,7 +60,7 @@ abstract class BaseGenerator
         foreach ($replacements as $placeholder => $replacement) {
             $content = str_replace("{{ {$placeholder} }}", $replacement, $content);
         }
-        
+
         return $content;
     }
 
@@ -70,8 +71,8 @@ abstract class BaseGenerator
     {
         $basePath = base_path();
         $relativePath = $this->config['paths'][$type] ?? "app/{$type}";
-        
-        return $basePath . '/' . $relativePath . '/' . $fileName;
+
+        return $basePath.'/'.$relativePath.'/'.$fileName;
     }
 
     /**
@@ -80,8 +81,8 @@ abstract class BaseGenerator
     protected function ensureDirectoryExists(string $filePath): void
     {
         $directory = dirname($filePath);
-        
-        if (!$this->filesystem->isDirectory($directory)) {
+
+        if (! $this->filesystem->isDirectory($directory)) {
             $this->filesystem->makeDirectory($directory, 0755, true);
         }
     }
@@ -91,12 +92,12 @@ abstract class BaseGenerator
      */
     protected function writeFile(string $filePath, string $content, bool $force = false): bool
     {
-        if (!$force && $this->filesystem->exists($filePath)) {
+        if (! $force && $this->filesystem->exists($filePath)) {
             throw new \Exception("File already exists: {$filePath}");
         }
-        
+
         $this->ensureDirectoryExists($filePath);
-        
+
         return $this->filesystem->put($filePath, $content) !== false;
     }
 
@@ -116,27 +117,27 @@ abstract class BaseGenerator
         if (empty($array)) {
             return '[]';
         }
-        
+
         $indentStr = str_repeat(' ', $indent);
         $items = [];
-        
+
         foreach ($array as $key => $value) {
             if (is_numeric($key)) {
                 if (is_array($value)) {
-                    $items[] = $indentStr . $this->arrayToString($value, $indent + 4);
+                    $items[] = $indentStr.$this->arrayToString($value, $indent + 4);
                 } else {
-                    $items[] = $indentStr . "'{$value}'";
+                    $items[] = $indentStr."'{$value}'";
                 }
             } else {
                 if (is_array($value)) {
-                    $items[] = $indentStr . "'{$key}' => " . $this->arrayToString($value, $indent + 4);
+                    $items[] = $indentStr."'{$key}' => ".$this->arrayToString($value, $indent + 4);
                 } else {
-                    $items[] = $indentStr . "'{$key}' => '{$value}'";
+                    $items[] = $indentStr."'{$key}' => '{$value}'";
                 }
             }
         }
-        
-        return "[\n" . implode(",\n", $items) . "\n" . str_repeat(' ', $indent - 2) . "]";
+
+        return "[\n".implode(",\n", $items)."\n".str_repeat(' ', $indent - 2).']';
     }
 
     /**
@@ -147,18 +148,18 @@ abstract class BaseGenerator
         if (empty($rules)) {
             return '[]';
         }
-        
+
         $items = [];
         foreach ($rules as $field => $fieldRules) {
             if (is_array($fieldRules)) {
-                $rulesStr = "'" . implode('|', $fieldRules) . "'";
+                $rulesStr = "'".implode('|', $fieldRules)."'";
             } else {
                 $rulesStr = "'{$fieldRules}'";
             }
             $items[] = "            '{$field}' => {$rulesStr}";
         }
-        
-        return "[\n" . implode(",\n", $items) . "\n        ]";
+
+        return "[\n".implode(",\n", $items)."\n        ]";
     }
 
     /**
@@ -169,10 +170,10 @@ abstract class BaseGenerator
         if (empty($uses)) {
             return '';
         }
-        
+
         sort($uses);
-        $statements = array_map(fn($use) => "use {$use};", $uses);
-        
+        $statements = array_map(fn ($use) => "use {$use};", $uses);
+
         return implode("\n", $statements);
     }
 
@@ -246,7 +247,7 @@ abstract class BaseGenerator
     protected function generateFileHeader(string $description = ''): string
     {
         $timestamp = $this->getCurrentTimestamp();
-        
+
         return "<?php\n\n/**\n * Generated by CRUD Builder\n * {$description}\n * Generated at: {$timestamp}\n */\n\n";
     }
 

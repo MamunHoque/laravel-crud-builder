@@ -2,8 +2,8 @@
 
 namespace MamunHoque\CrudBuilder\Generators;
 
-use MamunHoque\CrudBuilder\Data\MigrationData;
 use MamunHoque\CrudBuilder\Data\ColumnData;
+use MamunHoque\CrudBuilder\Data\MigrationData;
 
 class ServiceGenerator extends BaseGenerator
 {
@@ -12,16 +12,16 @@ class ServiceGenerator extends BaseGenerator
      */
     public function generate(string $modelName, MigrationData $migrationData, array $options = []): array|string
     {
-        if (!$this->shouldGenerate('service', $options)) {
+        if (! $this->shouldGenerate('service', $options)) {
             return [];
         }
 
         $stub = $this->getStub('service');
-        
+
         $serviceName = $migrationData->getServiceName();
         $searchableColumns = $migrationData->getSearchableColumns();
         $eagerLoadRelationships = $migrationData->getEagerLoadRelationships();
-        
+
         $replacements = [
             'namespace' => $this->getNamespace('services'),
             'className' => $serviceName,
@@ -34,12 +34,12 @@ class ServiceGenerator extends BaseGenerator
         ];
 
         $content = $this->replacePlaceholders($stub, $replacements);
-        
+
         $fileName = "{$serviceName}.php";
         $filePath = $this->getFilePath('services', $fileName);
-        
+
         $this->writeFile($filePath, $content, $options['force'] ?? false);
-        
+
         return $filePath;
     }
 
@@ -51,9 +51,9 @@ class ServiceGenerator extends BaseGenerator
         if (empty($searchableColumns)) {
             return "['name']"; // Default fallback
         }
-        
-        $searchKeys = array_map(fn(ColumnData $column) => $column->name, $searchableColumns);
-        
+
+        $searchKeys = array_map(fn (ColumnData $column) => $column->name, $searchableColumns);
+
         return $this->arrayToString($searchKeys, 0);
     }
 
@@ -65,10 +65,10 @@ class ServiceGenerator extends BaseGenerator
         if (empty($relationships)) {
             return '';
         }
-        
-        $relationshipNames = array_map(fn($rel) => $rel->relationshipName, $relationships);
-        $relationshipsStr = "'" . implode("', '", $relationshipNames) . "'";
-        
+
+        $relationshipNames = array_map(fn ($rel) => $rel->relationshipName, $relationships);
+        $relationshipsStr = "'".implode("', '", $relationshipNames)."'";
+
         return "\n        \$query->with([{$relationshipsStr}]);";
     }
 
@@ -78,24 +78,24 @@ class ServiceGenerator extends BaseGenerator
     protected function generateFilters(MigrationData $migrationData): string
     {
         $filters = [];
-        
+
         // Generate filters for foreign key relationships
         foreach ($migrationData->getBelongsToRelationships() as $relationship) {
             $filters[] = $this->generateRelationshipFilter($relationship);
         }
-        
+
         // Generate filters for enum columns
         foreach ($migrationData->getColumns() as $column) {
             if ($column->enumValues) {
                 $filters[] = $this->generateEnumFilter($column);
             }
         }
-        
+
         if (empty($filters)) {
             return '';
         }
-        
-        return "\n\n        // Apply filters\n" . implode("\n", $filters);
+
+        return "\n\n        // Apply filters\n".implode("\n", $filters);
     }
 
     /**
@@ -104,10 +104,10 @@ class ServiceGenerator extends BaseGenerator
     protected function generateRelationshipFilter($relationship): string
     {
         $filterParam = $relationship->localKey;
-        
-        return "        if (\$request->filled('{$filterParam}')) {\n" .
-               "            \$query->where('{$relationship->localKey}', \$request->input('{$filterParam}'));\n" .
-               "        }";
+
+        return "        if (\$request->filled('{$filterParam}')) {\n".
+               "            \$query->where('{$relationship->localKey}', \$request->input('{$filterParam}'));\n".
+               '        }';
     }
 
     /**
@@ -115,9 +115,9 @@ class ServiceGenerator extends BaseGenerator
      */
     protected function generateEnumFilter(ColumnData $column): string
     {
-        return "        if (\$request->filled('{$column->name}')) {\n" .
-               "            \$query->where('{$column->name}', \$request->input('{$column->name}'));\n" .
-               "        }";
+        return "        if (\$request->filled('{$column->name}')) {\n".
+               "            \$query->where('{$column->name}', \$request->input('{$column->name}'));\n".
+               '        }';
     }
 
     /**
@@ -128,24 +128,24 @@ class ServiceGenerator extends BaseGenerator
         $methodName = "prepare{$modelName}Data";
         $variableName = $this->camel($modelName);
         $fillableColumns = $migrationData->getFillableColumns();
-        
+
         $fileUploadHandling = $this->generateFileUploadHandling($fillableColumns);
-        
-        return "    private function {$methodName}(\$request, bool \$isNew = true): array\n" .
-               "    {\n" .
-               "        \$validated = \$request->validated();\n" .
-               "        // Get the fillable fields from the model\n" .
-               "        \$fillable = (new {$modelName}())->getFillable();\n\n" .
-               "        // Extract relevant fields from the request dynamically\n" .
-               "        \$data = array_intersect_key(\$validated, array_flip(\$fillable));\n\n" .
-               $fileUploadHandling .
-               "\n        // Add created_by and created_at fields for new records\n" .
-               "        if (\$isNew) {\n" .
-               "            \$data['user_id'] = auth()->user()->id ?? null;\n" .
-               "            \$data['created_at'] = now();\n" .
-               "        }\n\n" .
-               "        return \$data;\n" .
-               "    }";
+
+        return "    private function {$methodName}(\$request, bool \$isNew = true): array\n".
+               "    {\n".
+               "        \$validated = \$request->validated();\n".
+               "        // Get the fillable fields from the model\n".
+               "        \$fillable = (new {$modelName}())->getFillable();\n\n".
+               "        // Extract relevant fields from the request dynamically\n".
+               "        \$data = array_intersect_key(\$validated, array_flip(\$fillable));\n\n".
+               $fileUploadHandling.
+               "\n        // Add created_by and created_at fields for new records\n".
+               "        if (\$isNew) {\n".
+               "            \$data['user_id'] = auth()->user()->id ?? null;\n".
+               "            \$data['created_at'] = now();\n".
+               "        }\n\n".
+               "        return \$data;\n".
+               '    }';
     }
 
     /**
@@ -153,18 +153,18 @@ class ServiceGenerator extends BaseGenerator
      */
     protected function generateFileUploadHandling(array $columns): string
     {
-        $fileColumns = array_filter($columns, fn(ColumnData $column) => $column->shouldHaveAccessor());
-        
+        $fileColumns = array_filter($columns, fn (ColumnData $column) => $column->shouldHaveAccessor());
+
         if (empty($fileColumns)) {
-            return "        // Handle file uploads\n" .
+            return "        // Handle file uploads\n".
                    "        // \$data['featured_image'] = \$this->s3FileUpload(\$request, 'featured_image', '{$this->snake($this->modelName)}')['path'] ?? null;";
         }
-        
+
         $uploadCode = "        // Handle file uploads\n";
         foreach ($fileColumns as $column) {
             $uploadCode .= "        \$data['{$column->name}'] = \$this->s3FileUpload(\$request, '{$column->name}', '{$this->snake($this->modelName)}')['path'] ?? null;\n";
         }
-        
+
         return $uploadCode;
     }
 }

@@ -25,19 +25,19 @@ class RelationshipData
             case 'belongsTo':
                 // user_id -> user
                 return str_replace('_id', '', $this->localKey);
-                
+
             case 'hasMany':
                 // users table -> users
                 return $this->foreignTable;
-                
+
             case 'hasOne':
                 // user table -> user
                 return str()->singular($this->foreignTable);
-                
+
             case 'belongsToMany':
                 // categories -> categories
                 return $this->foreignTable;
-                
+
             default:
                 return $this->foreignTable;
         }
@@ -49,6 +49,7 @@ class RelationshipData
     protected function generateRelatedModel(): string
     {
         $modelName = str()->singular($this->foreignTable);
+
         return str()->studly($modelName);
     }
 
@@ -59,20 +60,20 @@ class RelationshipData
     {
         $methodName = $this->relationshipName;
         $relatedModel = $this->relatedModel;
-        
+
         switch ($this->type) {
             case 'belongsTo':
                 return "public function {$methodName}(): BelongsTo\n    {\n        return \$this->belongsTo({$relatedModel}::class, '{$this->localKey}', '{$this->foreignKey}');\n    }";
-                
+
             case 'hasMany':
                 return "public function {$methodName}(): HasMany\n    {\n        return \$this->hasMany({$relatedModel}::class, '{$this->localKey}', '{$this->foreignKey}');\n    }";
-                
+
             case 'hasOne':
                 return "public function {$methodName}(): HasOne\n    {\n        return \$this->hasOne({$relatedModel}::class, '{$this->localKey}', '{$this->foreignKey}');\n    }";
-                
+
             case 'belongsToMany':
                 return "public function {$methodName}(): BelongsToMany\n    {\n        return \$this->belongsToMany({$relatedModel}::class);\n    }";
-                
+
             default:
                 return '';
         }
@@ -84,12 +85,12 @@ class RelationshipData
     public function getUseStatements(): array
     {
         $uses = ["Illuminate\\Database\\Eloquent\\Relations\\{$this->getRelationshipClass()}"];
-        
+
         // Add related model use statement if it's in a different namespace
         if ($this->relatedModel !== 'User') { // Assuming User is always available
             $uses[] = "App\\Models\\{$this->relatedModel}";
         }
-        
+
         return $uses;
     }
 
@@ -126,8 +127,8 @@ class RelationshipData
         }
 
         $filterName = $this->localKey;
-        $methodName = "filter" . str()->studly($filterName);
-        
+        $methodName = 'filter'.str()->studly($filterName);
+
         return "protected function {$methodName}(Builder \$query, \$value): Builder\n    {\n        return \$query->where('{$this->localKey}', \$value);\n    }";
     }
 
@@ -144,7 +145,7 @@ class RelationshipData
                     foreignTable: $currentTable,
                     type: 'hasMany'
                 );
-                
+
             case 'hasMany':
                 return new RelationshipData(
                     localKey: $this->foreignKey,
@@ -152,7 +153,7 @@ class RelationshipData
                     foreignTable: $currentTable,
                     type: 'belongsTo'
                 );
-                
+
             case 'hasOne':
                 return new RelationshipData(
                     localKey: $this->foreignKey,
@@ -160,7 +161,7 @@ class RelationshipData
                     foreignTable: $currentTable,
                     type: 'belongsTo'
                 );
-                
+
             default:
                 return null;
         }

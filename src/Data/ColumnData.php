@@ -35,10 +35,10 @@ class ColumnData
         // Exclude system columns
         $excludedColumns = [
             'id', 'created_at', 'updated_at', 'deleted_at', 'email_verified_at',
-            'remember_token', 'password'
+            'remember_token', 'password',
         ];
 
-        return !in_array($this->name, $excludedColumns) && !$this->autoIncrement;
+        return ! in_array($this->name, $excludedColumns) && ! $this->autoIncrement;
     }
 
     /**
@@ -49,8 +49,8 @@ class ColumnData
         $searchableTypes = ['string', 'text', 'longText', 'mediumText', 'tinyText'];
         $sensitiveFields = ['password', 'token', 'secret', 'key', 'hash'];
 
-        return in_array($this->type, $searchableTypes) && 
-               !$this->containsSensitiveKeyword($sensitiveFields);
+        return in_array($this->type, $searchableTypes) &&
+               ! $this->containsSensitiveKeyword($sensitiveFields);
     }
 
     /**
@@ -59,13 +59,13 @@ class ColumnData
     protected function containsSensitiveKeyword(array $keywords): bool
     {
         $lowercaseName = strtolower($this->name);
-        
+
         foreach ($keywords as $keyword) {
             if (str_contains($lowercaseName, $keyword)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -77,7 +77,7 @@ class ColumnData
         $rules = [];
 
         // Required rule
-        if (!$this->nullable && !$isUpdate) {
+        if (! $this->nullable && ! $isUpdate) {
             $rules[] = 'required';
         } elseif ($this->nullable || $isUpdate) {
             $rules[] = 'nullable';
@@ -158,8 +158,8 @@ class ColumnData
         }
 
         // Unique rule
-        if ($this->unique && !$isUpdate) {
-            $rules[] = 'unique:' . $this->getTableName() . ',' . $this->name;
+        if ($this->unique && ! $isUpdate) {
+            $rules[] = 'unique:'.$this->getTableName().','.$this->name;
         }
 
         return $rules;
@@ -170,12 +170,13 @@ class ColumnData
      */
     public function getForeignTableName(): ?string
     {
-        if (!$this->isForeignKey()) {
+        if (! $this->isForeignKey()) {
             return null;
         }
 
         // Remove '_id' suffix and pluralize
         $baseName = str_replace('_id', '', $this->name);
+
         return str()->plural($baseName);
     }
 
@@ -226,7 +227,7 @@ class ColumnData
     {
         // Generate accessors for file/image columns
         $fileColumns = ['image', 'photo', 'avatar', 'file', 'document', 'attachment'];
-        
+
         foreach ($fileColumns as $fileColumn) {
             if (str_contains(strtolower($this->name), $fileColumn)) {
                 return true;

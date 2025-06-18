@@ -2,8 +2,8 @@
 
 namespace MamunHoque\CrudBuilder\Generators;
 
-use MamunHoque\CrudBuilder\Data\MigrationData;
 use MamunHoque\CrudBuilder\Data\ColumnData;
+use MamunHoque\CrudBuilder\Data\MigrationData;
 
 class ModelGenerator extends BaseGenerator
 {
@@ -12,12 +12,12 @@ class ModelGenerator extends BaseGenerator
      */
     public function generate(string $modelName, MigrationData $migrationData, array $options = []): array|string
     {
-        if (!$this->shouldGenerate('model', $options)) {
+        if (! $this->shouldGenerate('model', $options)) {
             return [];
         }
 
         $stub = $this->getStub('model');
-        
+
         $replacements = [
             'namespace' => $this->getNamespace('models'),
             'className' => $modelName,
@@ -32,12 +32,12 @@ class ModelGenerator extends BaseGenerator
         ];
 
         $content = $this->replacePlaceholders($stub, $replacements);
-        
+
         $fileName = "{$modelName}.php";
         $filePath = $this->getFilePath('models', $fileName);
-        
+
         $this->writeFile($filePath, $content, $options['force'] ?? false);
-        
+
         return $filePath;
     }
 
@@ -49,8 +49,8 @@ class ModelGenerator extends BaseGenerator
         if (empty($traits)) {
             return '';
         }
-        
-        return 'use ' . implode(', ', $traits) . ';';
+
+        return 'use '.implode(', ', $traits).';';
     }
 
     /**
@@ -61,9 +61,9 @@ class ModelGenerator extends BaseGenerator
         if (empty($columns)) {
             return '[]';
         }
-        
-        $fillableFields = array_map(fn(ColumnData $column) => $column->name, $columns);
-        
+
+        $fillableFields = array_map(fn (ColumnData $column) => $column->name, $columns);
+
         return $this->arrayToString($fillableFields, 8);
     }
 
@@ -75,7 +75,7 @@ class ModelGenerator extends BaseGenerator
         if (empty($columns)) {
             return '[]';
         }
-        
+
         $casts = [];
         foreach ($columns as $column) {
             $castType = $column->getCastType();
@@ -83,11 +83,11 @@ class ModelGenerator extends BaseGenerator
                 $casts[$column->name] = $castType;
             }
         }
-        
+
         if (empty($casts)) {
             return '[]';
         }
-        
+
         return $this->arrayToString($casts, 8);
     }
 
@@ -99,15 +99,15 @@ class ModelGenerator extends BaseGenerator
         if (empty($relationships)) {
             return '';
         }
-        
+
         $methods = [];
         foreach ($relationships as $relationship) {
-            $methods[] = '    /**' . "\n" . 
-                        '     * ' . ucfirst($relationship->type) . ' relationship with ' . $relationship->relatedModel . "\n" .
-                        '     */' . "\n" .
-                        '    ' . $relationship->getRelationshipMethod();
+            $methods[] = '    /**'."\n".
+                        '     * '.ucfirst($relationship->type).' relationship with '.$relationship->relatedModel."\n".
+                        '     */'."\n".
+                        '    '.$relationship->getRelationshipMethod();
         }
-        
+
         return implode("\n\n", $methods);
     }
 
@@ -119,14 +119,14 @@ class ModelGenerator extends BaseGenerator
         if (empty($columns)) {
             return '';
         }
-        
+
         $accessors = [];
         foreach ($columns as $column) {
             if ($column->shouldHaveAccessor()) {
                 $accessors[] = $this->generateAccessorMethod($column);
             }
         }
-        
+
         return implode("\n\n", $accessors);
     }
 
@@ -135,19 +135,19 @@ class ModelGenerator extends BaseGenerator
      */
     protected function generateAccessorMethod(ColumnData $column): string
     {
-        $methodName = 'get' . $this->studly($column->name) . 'UrlAttribute';
+        $methodName = 'get'.$this->studly($column->name).'UrlAttribute';
         $configKey = 'filesystems.disks.s3.url';
-        
-        return "    /**\n" .
-               "     * Get the URL for {$column->name}\n" .
-               "     */\n" .
-               "    public function {$methodName}(): ?string\n" .
-               "    {\n" .
-               "        if (\$this->{$column->name}) {\n" .
-               "            return config('{$configKey}') . '/' . \$this->{$column->name};\n" .
-               "        }\n" .
-               "        return null;\n" .
-               "    }";
+
+        return "    /**\n".
+               "     * Get the URL for {$column->name}\n".
+               "     */\n".
+               "    public function {$methodName}(): ?string\n".
+               "    {\n".
+               "        if (\$this->{$column->name}) {\n".
+               "            return config('{$configKey}') . '/' . \$this->{$column->name};\n".
+               "        }\n".
+               "        return null;\n".
+               '    }';
     }
 
     /**
@@ -156,17 +156,17 @@ class ModelGenerator extends BaseGenerator
     protected function generateAppends(array $columns): string
     {
         $appendFields = [];
-        
+
         foreach ($columns as $column) {
             if ($column->shouldHaveAccessor()) {
-                $appendFields[] = $this->snake($column->name) . '_url';
+                $appendFields[] = $this->snake($column->name).'_url';
             }
         }
-        
+
         if (empty($appendFields)) {
             return '[]';
         }
-        
+
         return $this->arrayToString($appendFields, 8);
     }
 }

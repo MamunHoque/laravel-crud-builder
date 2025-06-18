@@ -8,6 +8,7 @@ use MamunHoque\CrudBuilder\CrudBuilder;
 class MakeControllerCommand extends Command
 {
     protected $signature = 'make:crud-controller {name} {--force}';
+
     protected $description = 'Generate controller with intelligent migration parsing';
 
     protected CrudBuilder $crudBuilder;
@@ -21,7 +22,7 @@ class MakeControllerCommand extends Command
     public function handle(): int
     {
         $modelName = $this->argument('name');
-        
+
         try {
             $options = [
                 'model' => false,
@@ -35,12 +36,13 @@ class MakeControllerCommand extends Command
             ];
 
             $results = $this->crudBuilder->build($modelName, $options);
-            
+
             $this->info("✅ Controller generated successfully: {$results['controller']}");
-            
+
             return self::SUCCESS;
         } catch (\Exception $e) {
             $this->error("❌ Error: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }
